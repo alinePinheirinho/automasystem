@@ -2,7 +2,7 @@ package br.com.systemautoma.automasystem.entity;
 
 public class Estoque {
 
-    private long idEstoque;
+    private long idFilial;
     private long idEmpresa;
     private double quantidade;
     private double quantidadeMinima;
@@ -30,9 +30,9 @@ public class Estoque {
         this.quantidadeMaxima = quantidadeMaxima;
     }
 
-    public long getIdEstoque() { return idEstoque; }
+    public long getIdFilial() { return idFilial; }
 
-    public void setIdEstoque(long idEstoque) { this.idEstoque = idEstoque; }
+    public void setIdFilial(long idFilial) { this.idFilial = idFilial; }
 
     public long getIdEmpresa() { return idEmpresa; }
 

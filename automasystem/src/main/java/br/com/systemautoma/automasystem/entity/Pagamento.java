@@ -8,15 +8,17 @@ public class Pagamento {
 
     private long idPagamento;
     private long idVenda;
+    private long idFilial;
     private TipoPagamento tipoPagamento;
     private BigDecimal valor;
 
     public Pagamento(){ }
 
-    public Pagamento(long idVenda, TipoPagamento tipoPagamento, BigDecimal valor) {
+    public Pagamento(long idVenda, TipoPagamento tipoPagamento, BigDecimal valor, long idFilial) {
         this.idVenda = idVenda;
         this.tipoPagamento = tipoPagamento;
         this.valor = valor;
+        this.idFilial = idFilial;
     }
 
     public long getIdPagamento() {
@@ -46,4 +48,8 @@ public class Pagamento {
     public void setValor(BigDecimal valor) {
         this.valor = valor;
     }
+
+    public long getIdFilial() { return idFilial; }
+
+    public void setIdFilial(long idFilial) { this.idFilial = idFilial; }
 }

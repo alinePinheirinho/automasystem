@@ -8,6 +8,7 @@ import java.util.List;
 public class Venda {
 
     private long idVenda;
+    private long idFilial;
     private List<VendaItem> itens;
     private Cliente cliente;
     private TipoDePreco tipoDePreco;
@@ -24,7 +25,7 @@ public class Venda {
 
     public Venda() { }
 
-    public Venda(List<VendaItem> itens, Cliente cliente, TipoDePreco tipoDePreco, BigDecimal valor, double volume,
+    public Venda(long idEmpresa, List<VendaItem> itens, Cliente cliente, TipoDePreco tipoDePreco, BigDecimal valor, double volume,
                  BigDecimal valorItens, BigDecimal valorComDescontos, BigDecimal valorComAcrescimos, BigDecimal valorTotal,
                  List<Pagamento> paramento, BigDecimal troco,
                  boolean vendaCancelada) {
@@ -40,7 +41,8 @@ public class Venda {
         this.paramento = paramento;
         this.troco = troco;
         this.vendaCancelada = vendaCancelada;
-        this.idVenda = 1001+1+ new Date().getTime();
+        this.idVenda = 1001+1+ idEmpresa + new Date().getTime();
+        this.idFilial = idEmpresa;
     }
 
     public long getIdVenda() {
@@ -149,5 +151,13 @@ public class Venda {
 
     public void setVendaCancelada(boolean vendaCancelada) {
         this.vendaCancelada = vendaCancelada;
+    }
+
+    public long getIdFilial() {
+        return idFilial;
+    }
+
+    public void setIdFilial(long idFilial) {
+        this.idFilial = idFilial;
     }
 }

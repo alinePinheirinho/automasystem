@@ -11,6 +11,7 @@ public class VendaItem {
     private long idCliente;
     private long idProduto;
     private long idEStoque;
+    private long idEmpresa;
     private TipoDePreco tipoDePreco;
     private BigDecimal valor;
     private double quantidadeVendida;
@@ -19,7 +20,7 @@ public class VendaItem {
 
     public VendaItem() { }
 
-    public VendaItem(long idVenda, long idCliente, long idProduto, long idEStoque, TipoDePreco tipoDePreco,
+    public VendaItem(long idEmpresa, long idVenda, long idCliente, long idProduto, long idEStoque, TipoDePreco tipoDePreco,
                      BigDecimal valor, double quantidadeVendida, boolean cancelado, boolean vendaCancelada) {
         this.idVenda = idVenda;
         this.idCliente = idCliente;
@@ -30,6 +31,7 @@ public class VendaItem {
         this.quantidadeVendida = quantidadeVendida;
         this.cancelado = cancelado;
         this.vendaCancelada = vendaCancelada;
+        this.idEmpresa = idEmpresa;
     }
 
     public long getIdVendaItem() {
@@ -107,4 +109,8 @@ public class VendaItem {
     public void setVendaCancelada(boolean vendaCancelada) {
         this.vendaCancelada = vendaCancelada;
     }
+
+    public long getIdEmpresa() {  return idEmpresa; }
+
+    public void setIdEmpresa(long idEmpresa) { this.idEmpresa = idEmpresa; }
 }

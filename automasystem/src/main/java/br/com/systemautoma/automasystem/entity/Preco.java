@@ -6,7 +6,7 @@ public class Preco {
 
     private long idPreco;
     private long idProduto;
-    private long idEmpresa;
+    private long idFilial;
     private BigDecimal precoVendaVarejo;
     private BigDecimal precoVendaAtacado;
     private BigDecimal precoVendaCompra;
@@ -69,7 +69,7 @@ public class Preco {
         this.precoParcelado = precoParcelado;
     }
 
-    public long getIdEmpresa() { return idEmpresa; }
+    public long getIdFilial() { return idFilial; }
 
-    public void setIdEmpresa(long idEmpresa) { this.idEmpresa = idEmpresa; }
+    public void setIdFilial(long idFilial) { this.idFilial = idFilial; }
 }

@@ -14,6 +14,10 @@ public class Endereco {
     private String estado;
     private String siglaEstado;
     private String cep;
+    private int codMunicio;
+    private int codEstado;
+    private int codPais;
+
 
     public Endereco(){}
 
@@ -104,4 +108,16 @@ public class Endereco {
     public void setCep(String cep) {
         this.cep = cep;
     }
+
+    public int getCodMunicio() { return codMunicio; }
+
+    public void setCodMunicio(int codMunicio) { this.codMunicio = codMunicio; }
+
+    public int getCodEstado() { return codEstado; }
+
+    public void setCodEstado(int codEstado) { this.codEstado = codEstado; }
+
+    public int getCodPais() { return codPais; }
+
+    public void setCodPais(int codPais) { this.codPais = codPais; }
 }
