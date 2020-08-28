@@ -1,20 +1,33 @@
 package br.com.systemautoma.automasystem.entity;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import javax.persistence.*;
 import java.util.List;
 
-public class Grade {
+@Entity
+@DynamicInsert
+@DynamicUpdate
+public class GradeDoProduto {
 
+    @Id
+    @GeneratedValue( strategy = GenerationType.IDENTITY)
     private long idGrade;
+    @ManyToMany
     private List<Cor> cor;
+    @ManyToMany
     private List<Tamanho> tamanho;
+    @OneToOne
     private Estoque estoque;
+    @OneToOne
     private Preco preco;
     private long idProduto;
     private long codBarras;
     private String codPersonalizado;
 
-    public Grade(List<Cor> cor, List<Tamanho> tamanho, Estoque estoque,
-                 Preco preco, long idProduto, long codBarras, String codPersonalizado) {
+    public GradeDoProduto(List<Cor> cor, List<Tamanho> tamanho, Estoque estoque,
+                          Preco preco, long idProduto, long codBarras, String codPersonalizado) {
         this.cor = cor;
         this.tamanho = tamanho;
         this.estoque = estoque;

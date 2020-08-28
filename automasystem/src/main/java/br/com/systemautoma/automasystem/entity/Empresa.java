@@ -1,7 +1,18 @@
 package br.com.systemautoma.automasystem.entity;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import javax.persistence.*;
+import java.util.List;
+
+@Entity
+@DynamicInsert
+@DynamicUpdate
 public class Empresa {
 
+    @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private long idEmpresa;
     private String razaoSocial;
     private String nomeFantasia;
@@ -9,8 +20,14 @@ public class Empresa {
     private String inscricaoEstadual;
     private String inscricaoMunicial;
     private String cnae;
+    @ManyToOne (cascade = CascadeType.ALL)
+    @JoinColumn(name = "endereco", referencedColumnName = "idEndereco")
     private Endereco endereco;
 
+    @OneToMany( mappedBy = "empresa", cascade=CascadeType.ALL)
+    private List<Filial> filiais;
+
+    public Empresa() { }
     public Empresa(String razaoSocial, String nomeFantasia,
                    String cnpj, String inscricaoEstadual, String inscricaoMunicial, String cnae, Endereco endereco) {
         this.razaoSocial = razaoSocial;

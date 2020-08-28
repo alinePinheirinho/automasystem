@@ -1,32 +1,61 @@
 package br.com.systemautoma.automasystem.entity;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 
+@Entity
+@DynamicInsert
+@DynamicUpdate
 public class Preco {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idPreco;
-    private long idProduto;
+    /*
+    @OneToOne (cascade = CascadeType.ALL)
+    @JoinColumn (name = "idFilial", referencedColumnName = "idFilial")
+    private Filial filial;
+
+    @ManyToOne (cascade = CascadeType.ALL)
+    @JoinColumn (name = "idProduto", referencedColumnName = "idProduto")
+    private Produto produto;
+
+    TODO: validar e remover
+     */
     private long idFilial;
     private BigDecimal precoVendaVarejo;
     private BigDecimal precoVendaAtacado;
     private BigDecimal precoVendaCompra;
     private BigDecimal precoPromocional;
     private BigDecimal precoParcelado;
+    private long idProduto;
+
+
+    public Preco(long idFilial, BigDecimal precoVendaVarejo, BigDecimal precoVendaAtacado,
+                 BigDecimal precoVendaCompra, BigDecimal precoPromocional, BigDecimal precoParcelado, long idProduto) {
+        this.idFilial = idFilial;
+        this.precoVendaVarejo = precoVendaVarejo;
+        this.precoVendaAtacado = precoVendaAtacado;
+        this.precoVendaCompra = precoVendaCompra;
+        this.precoPromocional = precoPromocional;
+        this.precoParcelado = precoParcelado;
+        this.idProduto = idProduto;
+    }
 
     public long getIdPreco() {
         return idPreco;
     }
 
-    public void setIdPreco(long idPreco) {
-        this.idPreco = idPreco;
+    public long getIdFilial() {
+        return idFilial;
     }
 
-    public long getIdProduto() {
-        return idProduto;
-    }
-
-    public void setIdProduto(long idProduto) {
-        this.idProduto = idProduto;
+    public void setIdFilial(long idFilial) {
+        this.idFilial = idFilial;
     }
 
     public BigDecimal getPrecoVendaVarejo() {
@@ -69,7 +98,11 @@ public class Preco {
         this.precoParcelado = precoParcelado;
     }
 
-    public long getIdFilial() { return idFilial; }
+    public long getIdProduto() {
+        return idProduto;
+    }
 
-    public void setIdFilial(long idFilial) { this.idFilial = idFilial; }
+    public void setIdProduto(long produto) {
+        this.idProduto = produto;
+    }
 }

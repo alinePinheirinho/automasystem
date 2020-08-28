@@ -1,33 +1,48 @@
 package br.com.systemautoma.automasystem.entity;
 
+import br.com.systemautoma.automasystem.domain.enumerador.TipoDeProduto;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import javax.persistence.*;
+import java.util.Collection;
 import java.util.Set;
 
+@Entity
+@DynamicInsert
+@DynamicUpdate
 public class Produto {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idProduto;
     private String nomeProduto;
     private String descricaoProduto;
-    private double precoVendaVarejo;
+    @OneToMany (cascade = CascadeType.ALL, mappedBy = "idPreco")
     private Set<Preco> precos;
-    private Set<Estoque> estoques;
+    @OneToMany (cascade = CascadeType.ALL, mappedBy = "idEstoque")
+    private Collection<Estoque> estoques;
     private boolean ativo = true;
     private long codBarras;
     private String codPersonalizado;
-    private Set<Grade> grades;
+    @OneToMany (cascade = CascadeType.ALL, mappedBy = "idGrade")
+    private Set<GradeDoProduto> gradeDoProdutos;
+    @Enumerated(EnumType.STRING)
+    private TipoDeProduto tipoDeProduto;
+
 
     public Produto() { }
 
-    public Produto(String nomeProduto, String descricaoProduto, double precoVendaVarejo,
-                   Set<Preco> precos, Set<Estoque> estoques, boolean ativo, long codBarras, String codPersonalizado, Set<Grade> grades) {
+    public Produto(String nomeProduto, String descricaoProduto, Set<Preco> precos, Set<Estoque> estoques,
+                   boolean ativo, long codBarras, String codPersonalizado, Set<GradeDoProduto> gradeDoProdutos) {
         this.nomeProduto = nomeProduto;
         this.descricaoProduto = descricaoProduto;
-        this.precoVendaVarejo = precoVendaVarejo;
         this.precos = precos;
         this.estoques = estoques;
         this.ativo = ativo;
         this.codBarras = codBarras;
         this.codPersonalizado = codPersonalizado;
-        this.grades = grades;
+        this.gradeDoProdutos = gradeDoProdutos;
     }
 
     public long getIdProduto() {
@@ -50,14 +65,6 @@ public class Produto {
         this.descricaoProduto = descricaoProduto;
     }
 
-    public double getPrecoVendaVarejo() {
-        return precoVendaVarejo;
-    }
-
-    public void setPrecoVendaVarejo(double precoVendaVarejo) {
-        this.precoVendaVarejo = precoVendaVarejo;
-    }
-
     public Set<Preco> getPrecos() {
         return precos;
     }
@@ -66,11 +73,11 @@ public class Produto {
         this.precos = precos;
     }
 
-    public Set<Estoque> getEstoques() {
+    public Collection<Estoque> getEstoques() {
         return estoques;
     }
 
-    public void setEstoques(Set<Estoque> estoques) {
+    public void setEstoques(Collection<Estoque> estoques) {
         this.estoques = estoques;
     }
 
@@ -98,11 +105,15 @@ public class Produto {
         this.codPersonalizado = codPersonalizado;
     }
 
-    public Set<Grade> getGrades() {
-        return grades;
+    public Set<GradeDoProduto> getGradeDoProdutos() {
+        return gradeDoProdutos;
     }
 
-    public void setGrades(Set<Grade> grades) {
-        this.grades = grades;
+    public void setGradeDoProdutos(Set<GradeDoProduto> gradeDoProdutos) {
+        this.gradeDoProdutos = gradeDoProdutos;
     }
+
+    public TipoDeProduto getTipoDeProduto() { return tipoDeProduto; }
+
+    public void setTipoDeProduto(TipoDeProduto tipoDeProduto) { this.tipoDeProduto = tipoDeProduto; }
 }

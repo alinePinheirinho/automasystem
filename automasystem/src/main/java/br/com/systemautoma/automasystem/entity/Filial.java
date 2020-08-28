@@ -1,10 +1,23 @@
 package br.com.systemautoma.automasystem.entity;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import javax.persistence.*;
+
+@Entity
+@DynamicInsert
+@DynamicUpdate
 public class Filial {
 
+    @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private long idFilial;
     private String nomeFilal;
+    @ManyToOne (targetEntity=Empresa.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "empresa", referencedColumnName = "idEmpresa")
     private Empresa empresa;
+    @OneToOne
     private Configuracao configuracao;
 
     public long getIdFilial() {

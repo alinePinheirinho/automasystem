@@ -1,14 +1,25 @@
 package br.com.systemautoma.automasystem.entity;
 
 import br.com.systemautoma.automasystem.domain.enumerador.TipoDeEndereco;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
+import javax.persistence.*;
+
+@Entity
+@DynamicInsert
+@DynamicUpdate
 public class Endereco {
 
+    @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private long idEndereco;
     private long idCliente;
+    @Enumerated(EnumType.STRING)
     private TipoDeEndereco tipoEndereco;
     private String rua;
     private String numero;
+    private String complemento;
     private String Bairro;
     private String cidade;
     private String estado;
@@ -120,4 +131,8 @@ public class Endereco {
     public int getCodPais() { return codPais; }
 
     public void setCodPais(int codPais) { this.codPais = codPais; }
+
+    public String getComplemento() { return complemento; }
+
+    public void setComplemento(String complemento) { this.complemento = complemento; }
 }

@@ -1,11 +1,22 @@
 package br.com.systemautoma.automasystem.entity;
 
 import br.com.systemautoma.automasystem.domain.enumerador.TipoPagamento;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 
+@Entity
+@DynamicInsert
+@DynamicUpdate
 public class Pagamento {
 
+    @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private long idPagamento;
     private long idVenda;
     private long idFilial;
