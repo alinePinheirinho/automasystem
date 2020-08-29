@@ -53,6 +53,8 @@ public class Cliente {
         return idCliente;
     }
 
+    public void setIdCliente(long idCliente) {  this.idCliente = idCliente; }
+
     public String getNome() {
         return nome;
     }
