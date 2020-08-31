@@ -19,8 +19,8 @@ public class Venda {
     private BigDecimal ValorRestante;
     private double volume;
     private BigDecimal valorItens;
-    private BigDecimal valorComDescontos;
-    private BigDecimal valorComAcrescimos;
+    private BigDecimal valorTotalDeDescontos;
+    private BigDecimal valorTotalDeAcrescimos;
     private BigDecimal valorTotal;
     private List<Pagamento> pagamentos;
     private BigDecimal troco;
@@ -31,7 +31,7 @@ public class Venda {
     public Venda() { }
 
     public Venda(long idEmpresa, List<VendaItem> itens, Cliente cliente, TipoDePreco tipoDePreco, BigDecimal valor, double volume,
-                 BigDecimal valorItens, BigDecimal valorComDescontos, BigDecimal valorComAcrescimos, BigDecimal valorTotal,
+                 BigDecimal valorItens, BigDecimal valorTotalDeDescontos, BigDecimal valorTotalDeAcrescimos, BigDecimal valorTotal,
                  List<Pagamento> paramento, BigDecimal troco,
                  boolean vendaCancelada, StatusPagamento statusPagamento) {
         this.itens = itens;
@@ -40,8 +40,8 @@ public class Venda {
         this.ValorRestante = valor;
         this.volume = volume;
         this.valorItens = valorItens;
-        this.valorComDescontos = valorComDescontos;
-        this.valorComAcrescimos = valorComAcrescimos;
+        this.valorTotalDeDescontos = valorTotalDeDescontos;
+        this.valorTotalDeAcrescimos = valorTotalDeAcrescimos;
         this.valorTotal = valorTotal;
         this.pagamentos = paramento;
         this.troco = troco;
@@ -111,20 +111,20 @@ public class Venda {
         this.valorItens = valorItens;
     }
 
-    public BigDecimal getValorComDescontos() {
-        return valorComDescontos;
+    public BigDecimal getValorTotalDeDescontos() {
+        return valorTotalDeDescontos;
     }
 
-    public void setValorComDescontos(BigDecimal valorComDescontos) {
-        this.valorComDescontos = valorComDescontos;
+    public void setValorTotalDeDescontos(BigDecimal valorTotalDeDescontos) {
+        this.valorTotalDeDescontos = valorTotalDeDescontos;
     }
 
-    public BigDecimal getValorComAcrescimos() {
-        return valorComAcrescimos;
+    public BigDecimal getValorTotalDeAcrescimos() {
+        return valorTotalDeAcrescimos;
     }
 
-    public void setValorComAcrescimos(BigDecimal valorComAcrescimos) {
-        this.valorComAcrescimos = valorComAcrescimos;
+    public void setValorTotalDeAcrescimos(BigDecimal valorTotalDeAcrescimos) {
+        this.valorTotalDeAcrescimos = valorTotalDeAcrescimos;
     }
 
     public BigDecimal getValorTotal() {

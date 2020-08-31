@@ -47,6 +47,7 @@ public class VendaProcessamento {
         venda.getItens().stream().filter(item -> !item.isCancelado()).forEach(item -> {
             item.setValor(item.getValor().subtract(rateio));
         });
+        venda.setValorTotalDeDescontos(descontoTotal);
         return venda.getItens();
     }
 
@@ -58,6 +59,7 @@ public class VendaProcessamento {
         venda.getItens().stream().filter(item -> !item.isCancelado()).forEach(item -> {
             item.setValor(item.getValor().add(rateio));
         });
+        venda.setValorTotalDeAcrescimos(acrescimoTotal);
         return venda.getItens();
     }
 
@@ -96,27 +98,32 @@ public class VendaProcessamento {
     }
 
     public BigDecimal lancaPagamento(Venda venda, BigDecimal valor, TipoPagamento tipoPagamento) throws BusinessVendaExpection {
+        calculaValorRestante(venda);
 
+        if (venda.getValorRestante().compareTo(new BigDecimal(0)) == 1){
+            atribuiPagamento(venda, valor, tipoPagamento);
+            if (venda.getValorRestante().compareTo(new BigDecimal(0)) == 1){
+                return retornaValorRestanteAposPagamento(venda);
+            } else {
+                return atribuiValorDeTroco(venda);
+            }
+        } else {
+            throw new BusinessVendaExpection("Venda sem saldo para efetuar Pagamento");
+        }
+    }
+
+    private BigDecimal atribuiValorDeTroco(Venda venda) {
+        venda.setTroco(new BigDecimal(venda.getValorRestante().toString()).abs());
+        venda.setStatusPagamento(StatusPagamento.PAGO);
+        return venda.getValorRestante();
+    }
+
+    private void calculaValorRestante(Venda venda) throws BusinessVendaExpection {
         if (venda.getValorRestante() == null){
             if (venda.getValorTotal() == null ) {
                 venda.setValorTotal(this.valorTotalVenda(venda));
             }
             venda.setValorRestante(venda.getValorTotal());
-        }
-        if (venda.getValorRestante().compareTo(new BigDecimal(0)) == 1){
-            Pagamento pagamento = atribuiPagamento(venda, valor, tipoPagamento);
-
-            if (venda.getValorRestante().compareTo(new BigDecimal(0)) == 1){
-                return retornaValorRestanteAposPagamento(venda);
-
-            } else {
-                venda.setTroco(new BigDecimal(venda.getValorRestante().toString()).abs());
-                venda.setStatusPagamento(StatusPagamento.PAGO);
-                return venda.getValorRestante();
-            }
-
-        } else {
-            throw new BusinessVendaExpection("Venda sem saldo para efetuar Pagamento");
         }
     }
 
