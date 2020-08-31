@@ -1,6 +1,9 @@
 package br.com.systemautoma.automasystem.entity;
 
 import br.com.systemautoma.automasystem.domain.TipoDePreco;
+import br.com.systemautoma.automasystem.domain.enumerador.StatusPagamento;
+
+import javax.persistence.Transient;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -12,37 +15,40 @@ public class Venda {
     private List<VendaItem> itens;
     private Cliente cliente;
     private TipoDePreco tipoDePreco;
-    private BigDecimal valor;
+    @Transient
+    private BigDecimal ValorRestante;
     private double volume;
     private BigDecimal valorItens;
     private BigDecimal valorComDescontos;
     private BigDecimal valorComAcrescimos;
     private BigDecimal valorTotal;
-    private List<Pagamento> paramento;
+    private List<Pagamento> pagamentos;
     private BigDecimal troco;
     private boolean vendaCancelada = false;
     private String statusVenda = "aberta";
+    private StatusPagamento statusPagamento;
 
     public Venda() { }
 
     public Venda(long idEmpresa, List<VendaItem> itens, Cliente cliente, TipoDePreco tipoDePreco, BigDecimal valor, double volume,
                  BigDecimal valorItens, BigDecimal valorComDescontos, BigDecimal valorComAcrescimos, BigDecimal valorTotal,
                  List<Pagamento> paramento, BigDecimal troco,
-                 boolean vendaCancelada) {
+                 boolean vendaCancelada, StatusPagamento statusPagamento) {
         this.itens = itens;
         this.cliente = cliente;
         this.tipoDePreco = tipoDePreco;
-        this.valor = valor;
+        this.ValorRestante = valor;
         this.volume = volume;
         this.valorItens = valorItens;
         this.valorComDescontos = valorComDescontos;
         this.valorComAcrescimos = valorComAcrescimos;
         this.valorTotal = valorTotal;
-        this.paramento = paramento;
+        this.pagamentos = paramento;
         this.troco = troco;
         this.vendaCancelada = vendaCancelada;
         this.idVenda = 1001+1+ idEmpresa + new Date().getTime();
         this.idFilial = idEmpresa;
+        this.statusPagamento = statusPagamento;
     }
 
     public long getIdVenda() {
@@ -81,12 +87,12 @@ public class Venda {
         this.tipoDePreco = tipoDePreco;
     }
 
-    public BigDecimal getValor() {
-        return valor;
+    public BigDecimal getValorRestante() {
+        return ValorRestante;
     }
 
-    public void setValor(BigDecimal valor) {
-        this.valor = valor;
+    public void setValorRestante(BigDecimal valorRestante) {
+        this.ValorRestante = valorRestante;
     }
 
     public double getVolume() {
@@ -129,12 +135,12 @@ public class Venda {
         this.valorTotal = valorTotal;
     }
 
-    public List<Pagamento> getParamento() {
-        return paramento;
+    public List<Pagamento> getPagamentos() {
+        return pagamentos;
     }
 
-    public void setParamento(List<Pagamento> paramento) {
-        this.paramento = paramento;
+    public void setPagamentos(List<Pagamento> paramento) {
+        this.pagamentos = paramento;
     }
 
     public BigDecimal getTroco() {
@@ -160,4 +166,8 @@ public class Venda {
     public void setIdFilial(long idFilial) {
         this.idFilial = idFilial;
     }
+
+    public StatusPagamento getStatusPagamento() { return statusPagamento; }
+
+    public void setStatusPagamento(StatusPagamento statusPagamento) { this.statusPagamento = statusPagamento; }
 }

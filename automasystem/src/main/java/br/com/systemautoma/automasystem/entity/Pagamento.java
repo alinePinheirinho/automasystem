@@ -1,5 +1,6 @@
 package br.com.systemautoma.automasystem.entity;
 
+import br.com.systemautoma.automasystem.domain.enumerador.StatusPagamento;
 import br.com.systemautoma.automasystem.domain.enumerador.TipoPagamento;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -22,14 +23,16 @@ public class Pagamento {
     private long idFilial;
     private TipoPagamento tipoPagamento;
     private BigDecimal valor;
+    private StatusPagamento statusPagamento;
 
     public Pagamento(){ }
 
-    public Pagamento(long idVenda, TipoPagamento tipoPagamento, BigDecimal valor, long idFilial) {
+    public Pagamento(long idVenda, TipoPagamento tipoPagamento, BigDecimal valor, long idFilial, StatusPagamento statusPagamento) {
         this.idVenda = idVenda;
         this.tipoPagamento = tipoPagamento;
         this.valor = valor;
         this.idFilial = idFilial;
+        this.statusPagamento = statusPagamento;
     }
 
     public long getIdPagamento() {
@@ -63,4 +66,8 @@ public class Pagamento {
     public long getIdFilial() { return idFilial; }
 
     public void setIdFilial(long idFilial) { this.idFilial = idFilial; }
+
+    public StatusPagamento getStatusPagamento() { return statusPagamento; }
+
+    public void setStatusPagamento(StatusPagamento statusPagamento) { this.statusPagamento = statusPagamento; }
 }

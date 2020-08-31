@@ -3,8 +3,12 @@ package br.com.systemautoma.automasystem.business;
 
 import br.com.systemautoma.automasystem.builder.VendaItemBuilder;
 import br.com.systemautoma.automasystem.business.venda.VendaProcessamento;
+import br.com.systemautoma.automasystem.domain.enumerador.TipoPagamento;
+import br.com.systemautoma.automasystem.entity.Pagamento;
 import br.com.systemautoma.automasystem.entity.Venda;
 import br.com.systemautoma.automasystem.entity.VendaItem;
+import br.com.systemautoma.automasystem.exceptions.BusinessVendaExpection;
+import br.com.systemautoma.automasystem.mother.PagamentoMother;
 import br.com.systemautoma.automasystem.mother.VendaItemMother;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +19,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -30,48 +36,120 @@ public class VendaProcessamentoTest {
         builderItem = new VendaItemBuilder();
         vendaProcessamento = new VendaProcessamento();
         venda = vendaProcessamento.abreVenda();
+        venda.setIdVenda(1L);
     }
 
     @Test
-    public void valorTotalVendaTest(){
-
+    public void valorTotalVendaTest() throws BusinessVendaExpection {
         VendaItem item = VendaItemMother.getVendaItem();
         VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(30)).eRetorna();
-        vendaProcessamento.setItens(Arrays.asList(item,item2));
+        venda.setItens(Arrays.asList(item,item2));
         BigDecimal total = vendaProcessamento.valorTotalVenda(venda);
         assertEquals(new BigDecimal(40),total);
     }
 
     @Test
-    public void valorTotalVendaComItemCanceladoTest(){
-
+    public void valorTotalVendaComItemCanceladoTest() throws BusinessVendaExpection {
         VendaItem item = VendaItemMother.getVendaItem();
         VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(30)).eRetorna();
         VendaItem item3 = builderItem.iniciaItemAlteravel().alteraStatusItemCacelado(true).eRetorna();
-        vendaProcessamento.setItens(Arrays.asList(item,item2, item3));
+        venda.setItens(Arrays.asList(item,item2, item3));
         BigDecimal total = vendaProcessamento.valorTotalVenda(venda);
         assertEquals(new BigDecimal(40),total);
     }
 
     @Test
-    public void verificaTotaldaVendaAposRateioDeDescontoTotal(){
-
+    public void verificaTotaldaVendaAposRateioDeDescontoTotalTest() throws BusinessVendaExpection {
         BigDecimal tot = new BigDecimal(0);
         VendaItem item = VendaItemMother.getVendaItem();
         VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(30)).eRetorna();
         VendaItem item3 = builderItem.iniciaItemAlteravel().alteraStatusItemCacelado(true).eRetorna();
-        vendaProcessamento.setItens(Arrays.asList(item,item2,item3));
-        vendaProcessamento.aplicaRateioDeDescontoTotal(new BigDecimal(10));
+        venda.setItens(Arrays.asList(item,item2,item3));
+        vendaProcessamento.aplicaRateioDeDescontoTotal(venda, new BigDecimal(10));
         BigDecimal total = vendaProcessamento.valorTotalVenda(venda);
         assertEquals(new BigDecimal(30),total);
     }
 
     @Test
-    public void cancelarVenda(){
+    public void verificaTotalAposaplicaRateioDeAcrescimoTotalTest() throws BusinessVendaExpection {
+        BigDecimal tot = new BigDecimal(0);
+        VendaItem item = VendaItemMother.getVendaItem();
+        VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(30)).eRetorna();
+        VendaItem item3 = builderItem.iniciaItemAlteravel().alteraStatusItemCacelado(true).eRetorna();
+        venda.setItens(Arrays.asList(item,item2,item3));
+        vendaProcessamento.aplicaRateioDeAcrescimoTotal(venda, new BigDecimal(10));
+        BigDecimal total = vendaProcessamento.valorTotalVenda(venda);
+        assertEquals(new BigDecimal(50),total);
+
+    }
+
+    @Test
+    public void verificaTotalDeVendaSemItensDeveRetornarExceptionTest() {
+        try{
+            vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.DINHEIRO);
+            BigDecimal total = vendaProcessamento.valorTotalVenda(venda);
+
+        } catch ( BusinessVendaExpection e){
+            assertEquals("Não há Itens Lançados para essa Venda", e.getMessage());
+        }
+    }
+
+    @Test
+    public void cancelarVendaTest(){
         VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(30)).eRetorna();
         VendaItem item3 = builderItem.iniciaItemAlteravel().alteraStatusItemCacelado(true).eRetorna();
         venda.setItens(Arrays.asList(item2,item3));
         Boolean vendaFoiCancelada = vendaProcessamento.cancelarVenda(venda);
         assertTrue(vendaFoiCancelada);
+        assertTrue(venda.getItens().get(0).isCancelado());
+      //  assertTrue(venda.getParamento().get);
     }
+
+    @Test
+    public void lancaPagamentoTest() throws BusinessVendaExpection {
+        VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(30)).eRetorna();
+        VendaItem item3 = builderItem.iniciaItemAlteravel().alteraStatusItemCacelado(false).eRetorna();
+        venda.setItens(Arrays.asList(item2,item3));
+        BigDecimal valorRestante = vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.DINHEIRO);
+        assertEquals(BigDecimal.ZERO, valorRestante);
+
+    }
+
+    @Test
+    public void lancaPagamentoComPagamentoJaExistenteTest() throws BusinessVendaExpection {
+        VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(90)).eRetorna();
+        VendaItem item3 = builderItem.iniciaItemAlteravel().alteraStatusItemCacelado(false).eRetorna();
+        venda.setItens(Arrays.asList(item2,item3));
+        vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.DINHEIRO);
+        BigDecimal valorRestanteSegPagamento = vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.DINHEIRO);
+        assertEquals(new BigDecimal(20), valorRestanteSegPagamento);
+    }
+
+    @Test
+    public void lancaPagamentoQueDevolvaTrocoTest() throws BusinessVendaExpection {
+        VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(40)).eRetorna();
+        VendaItem item3 = builderItem.iniciaItemAlteravel().alteraStatusItemCacelado(false).eRetorna();
+        venda.setItens(Arrays.asList(item2,item3));
+        vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.DINHEIRO);
+        BigDecimal valorRestanteSegPagamento = vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.DINHEIRO);
+        assertEquals(new BigDecimal(-30), venda.getValorRestante());
+        assertEquals(new BigDecimal(30), venda.getTroco());
+    }
+
+    @Test
+    public void lancaPagamentoQueDevolveExceptionTest() {
+        VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(30)).eRetorna();
+        VendaItem item3 = builderItem.iniciaItemAlteravel().alteraStatusItemCacelado(false).eRetorna();
+        venda.setItens(Arrays.asList(item2,item3));
+        venda.setValorRestante(new BigDecimal(0));
+        try{
+            vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.DINHEIRO);
+            BigDecimal valorRestanteSegPagamento = vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.DINHEIRO);
+
+        } catch ( BusinessVendaExpection e){
+            assertEquals("Venda sem saldo para efetuar Pagamento", e.getMessage());
+        }
+    }
+
+
 }
