@@ -35,7 +35,7 @@ public class VendaProcessamento {
 
     public void removeItemLogicamente(Venda venda, VendaItem item){
         if (venda.getItens().contains(item)) {
-            venda.getItens().get(abreVenda().getItens().indexOf(item)).setCancelado(true);
+            venda.getItens().get(venda.getItens().indexOf(item)).setCancelado(true);
         }
     }
 
@@ -76,25 +76,14 @@ public class VendaProcessamento {
     }
 
     public Boolean cancelarVenda(Venda venda){
-        if (venda.getItens() != null && venda.getItens().size() >1) {
+        if (venda.getItens() != null && venda.getItens().size() >=1) {
             cancelaTodosItensDaVenda(venda);
         }
-        if (venda.getPagamentos() != null && venda.getPagamentos().size() >1){
+        if (venda.getPagamentos() != null && venda.getPagamentos().size() >=1){
             cancelaTodosOsPagamentosDaVenda(venda);
         }
         venda.setVendaCancelada(true);
         return true;
-    }
-
-    private void cancelaTodosOsPagamentosDaVenda(Venda venda) {
-        venda.getPagamentos().forEach( pagamento ->
-                pagamento.setStatusPagamento(StatusPagamento.CANCELADO));
-    }
-
-    private void cancelaTodosItensDaVenda(Venda venda) {
-        if (venda.getItens()!= null) {
-            venda.getItens().forEach(item -> item.setCancelado(true));
-        }
     }
 
     public BigDecimal lancaPagamento(Venda venda, BigDecimal valor, TipoPagamento tipoPagamento) throws BusinessVendaExpection {
@@ -109,6 +98,17 @@ public class VendaProcessamento {
             }
         } else {
             throw new BusinessVendaExpection("Venda sem saldo para efetuar Pagamento");
+        }
+    }
+
+    private void cancelaTodosOsPagamentosDaVenda(Venda venda) {
+        venda.getPagamentos().forEach( pagamento ->
+                pagamento.setStatusPagamento(StatusPagamento.CANCELADO));
+    }
+
+    private void cancelaTodosItensDaVenda(Venda venda) {
+        if (venda.getItens()!= null) {
+            venda.getItens().forEach(item -> item.setCancelado(true));
         }
     }
 
