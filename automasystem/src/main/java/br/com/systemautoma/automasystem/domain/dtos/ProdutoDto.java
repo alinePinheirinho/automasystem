@@ -1,55 +1,32 @@
-package br.com.systemautoma.automasystem.entity;
+package br.com.systemautoma.automasystem.domain.dtos;
 
 import br.com.systemautoma.automasystem.domain.enumerador.TipoDeProduto;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-
-import javax.persistence.*;
+import br.com.systemautoma.automasystem.entity.Estoque;
+import br.com.systemautoma.automasystem.entity.GradeDoProduto;
+import br.com.systemautoma.automasystem.entity.Preco;
 import java.util.Collection;
 import java.util.Set;
 
-@Entity
-@DynamicInsert
-@DynamicUpdate
-public class Produto {
+public class ProdutoDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idProduto;
     private String nomeProduto;
     private String descricaoProduto;
-    @OneToMany (cascade = CascadeType.ALL, mappedBy = "idPreco")
     private Set<Preco> precos;
-    @OneToMany (cascade = CascadeType.ALL, mappedBy = "idEstoque")
     private Collection<Estoque> estoques;
     private boolean ativo = true;
     private long codBarras;
     private String codPersonalizado;
-    @OneToMany (cascade = CascadeType.ALL, mappedBy = "idGrade")
     private Set<GradeDoProduto> gradeDoProdutos;
-    @Enumerated(EnumType.STRING)
     private TipoDeProduto tipoDeProduto;
-
-
-    public Produto() { }
-
-    public Produto(String nomeProduto, String descricaoProduto, Set<Preco> precos, Set<Estoque> estoques,
-                   boolean ativo, long codBarras, String codPersonalizado, Set<GradeDoProduto> gradeDoProdutos) {
-        this.nomeProduto = nomeProduto;
-        this.descricaoProduto = descricaoProduto;
-        this.precos = precos;
-        this.estoques = estoques;
-        this.ativo = ativo;
-        this.codBarras = codBarras;
-        this.codPersonalizado = codPersonalizado;
-        this.gradeDoProdutos = gradeDoProdutos;
-    }
 
     public long getIdProduto() {
         return idProduto;
     }
 
-    public void setIdProduto(long idProduto) { this.idProduto = idProduto; }
+    public void setIdProduto(long idProduto) {
+        this.idProduto = idProduto;
+    }
 
     public String getNomeProduto() {
         return nomeProduto;
@@ -115,7 +92,11 @@ public class Produto {
         this.gradeDoProdutos = gradeDoProdutos;
     }
 
-    public TipoDeProduto getTipoDeProduto() { return tipoDeProduto; }
+    public TipoDeProduto getTipoDeProduto() {
+        return tipoDeProduto;
+    }
 
-    public void setTipoDeProduto(TipoDeProduto tipoDeProduto) { this.tipoDeProduto = tipoDeProduto; }
+    public void setTipoDeProduto(TipoDeProduto tipoDeProduto) {
+        this.tipoDeProduto = tipoDeProduto;
+    }
 }
