@@ -47,15 +47,15 @@ public class ProdutoControllerTest {
     public void setUp ()
     {
         MockitoAnnotations.initMocks(this);
-        //mvc = MockMvcBuilders.webAppContextSetup(conext).build();
-        mvc = MockMvcBuilders.standaloneSetup(produtoController).build();
+       //mvc = MockMvcBuilders.webAppContextSetup(conext).build(); -- dessa forma funciona integrado!!!
+       mvc = MockMvcBuilders.standaloneSetup(produtoController).build();
     }
 
 
     @Test
     public void buscarProdutoCadastradoTest() throws Exception {
 
-        mvc.perform(MockMvcRequestBuilders.get("http://localhost:8080/produtos/produto/2")
+        mvc.perform(MockMvcRequestBuilders.get("/produtos/produto/2")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -72,7 +72,7 @@ public class ProdutoControllerTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 
-        mvc.perform(MockMvcRequestBuilders.post("http://localhost:8080/produtos/produto/")
+        mvc.perform(MockMvcRequestBuilders.post("/produtos/produto/")
                 .headers(headers)
                 .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .content(json))
