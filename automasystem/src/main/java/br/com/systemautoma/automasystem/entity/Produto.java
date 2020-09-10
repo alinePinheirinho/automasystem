@@ -5,13 +5,15 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @DynamicInsert
 @DynamicUpdate
-public class Produto {
+public class Produto implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -118,4 +120,26 @@ public class Produto {
     public TipoDeProduto getTipoDeProduto() { return tipoDeProduto; }
 
     public void setTipoDeProduto(TipoDeProduto tipoDeProduto) { this.tipoDeProduto = tipoDeProduto; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Produto produto = (Produto) o;
+        return idProduto == produto.idProduto &&
+                ativo == produto.ativo &&
+                codBarras == produto.codBarras &&
+                Objects.equals(nomeProduto, produto.nomeProduto) &&
+                Objects.equals(descricaoProduto, produto.descricaoProduto) &&
+                Objects.equals(precos, produto.precos) &&
+                Objects.equals(estoques, produto.estoques) &&
+                Objects.equals(codPersonalizado, produto.codPersonalizado) &&
+                Objects.equals(gradeDoProdutos, produto.gradeDoProdutos) &&
+                tipoDeProduto == produto.tipoDeProduto;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idProduto, nomeProduto, descricaoProduto, precos, estoques, ativo, codBarras, codPersonalizado, gradeDoProdutos, tipoDeProduto);
+    }
 }

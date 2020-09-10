@@ -5,11 +5,14 @@ import br.com.systemautoma.automasystem.entity.Estoque;
 import br.com.systemautoma.automasystem.entity.GradeDoProduto;
 import br.com.systemautoma.automasystem.entity.Preco;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
+import javax.validation.constraints.NotBlank;
 
 public class ProdutoDto {
 
     private long idProduto;
+    @NotBlank
     private String nomeProduto;
     private String descricaoProduto;
     private Set<Preco> precos;
@@ -98,5 +101,27 @@ public class ProdutoDto {
 
     public void setTipoDeProduto(TipoDeProduto tipoDeProduto) {
         this.tipoDeProduto = tipoDeProduto;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProdutoDto that = (ProdutoDto) o;
+        return idProduto == that.idProduto &&
+                ativo == that.ativo &&
+                codBarras == that.codBarras &&
+                Objects.equals(nomeProduto, that.nomeProduto) &&
+                Objects.equals(descricaoProduto, that.descricaoProduto) &&
+                Objects.equals(precos, that.precos) &&
+                Objects.equals(estoques, that.estoques) &&
+                Objects.equals(codPersonalizado, that.codPersonalizado) &&
+                Objects.equals(gradeDoProdutos, that.gradeDoProdutos) &&
+                tipoDeProduto == that.tipoDeProduto;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idProduto, nomeProduto, descricaoProduto, precos, estoques, ativo, codBarras, codPersonalizado, gradeDoProdutos, tipoDeProduto);
     }
 }

@@ -5,12 +5,13 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
 @DynamicInsert
 @DynamicUpdate
-public class Preco {
+public class Preco implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +35,7 @@ public class Preco {
     private BigDecimal precoParcelado;
     private long idProduto;
 
+    public Preco() { }
 
     public Preco(long idFilial, BigDecimal precoVendaVarejo, BigDecimal precoVendaAtacado,
                  BigDecimal precoVendaCompra, BigDecimal precoPromocional, BigDecimal precoParcelado, long idProduto) {

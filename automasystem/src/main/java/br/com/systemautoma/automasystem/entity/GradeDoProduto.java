@@ -4,12 +4,13 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @DynamicInsert
 @DynamicUpdate
-public class GradeDoProduto {
+public class GradeDoProduto implements Serializable {
 
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY)
