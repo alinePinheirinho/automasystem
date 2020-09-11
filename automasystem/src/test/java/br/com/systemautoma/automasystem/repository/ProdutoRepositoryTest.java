@@ -33,6 +33,7 @@ public class ProdutoRepositoryTest {
     public void cadastroDeProdutoEEstoqueTest(){
 
         Produto produto = ProdutoMother.getProduto();
+        produto.getEstoques().forEach(e -> e.setIdEstoque(0L));
         repositoryProduto.save(produto);
     }
 }

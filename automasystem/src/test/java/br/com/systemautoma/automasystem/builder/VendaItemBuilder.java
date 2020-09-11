@@ -24,6 +24,16 @@ public class VendaItemBuilder {
         return this;
     }
 
+    public VendaItemBuilder alteraIdProduto(long idProduto){
+        itemAltevel.setIdProduto(idProduto);
+        return this;
+    }
+
+    public VendaItemBuilder alteraIdDoEstoque(long idEstoque){
+        itemAltevel.setIdEStoque(idEstoque);
+        return this;
+    }
+
     public VendaItem eRetorna(){
         return this.itemAltevel;
     }

@@ -76,4 +76,6 @@ public class Estoque implements Serializable {
     public void setIdProduto(long idProduto) {
         this.idProduto = idProduto;
     }
+
+    public void setIdEstoque(long idEstoque) {  this.idEstoque = idEstoque; }
 }

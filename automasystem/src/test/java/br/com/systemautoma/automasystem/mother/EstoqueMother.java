@@ -7,7 +7,10 @@ import br.com.systemautoma.automasystem.entity.Produto;
 public class EstoqueMother {
 
     public static Estoque getUmEstoqueParaOProduto(long idProduto){
-        return new Estoque(1L, 10L,
-                1L,100, 1L );
+        Estoque estoque = new Estoque(1L, 10L,
+                1L,100, 1L);
+
+        estoque.setIdEstoque(1L);
+        return estoque;
     }
 }

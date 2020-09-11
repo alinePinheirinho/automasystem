@@ -3,38 +3,72 @@ package br.com.systemautoma.automasystem.business;
 
 import br.com.systemautoma.automasystem.builder.VendaItemBuilder;
 import br.com.systemautoma.automasystem.business.venda.VendaProcessamento;
+import br.com.systemautoma.automasystem.domain.TipoDePreco;
+import br.com.systemautoma.automasystem.domain.converter.Converter;
+import br.com.systemautoma.automasystem.domain.dtos.ProdutoDto;
 import br.com.systemautoma.automasystem.domain.enumerador.StatusPagamento;
 import br.com.systemautoma.automasystem.domain.enumerador.TipoPagamento;
+import br.com.systemautoma.automasystem.entity.Estoque;
 import br.com.systemautoma.automasystem.entity.Venda;
 import br.com.systemautoma.automasystem.entity.VendaItem;
 import br.com.systemautoma.automasystem.exceptions.BusinessVendaExpection;
+import br.com.systemautoma.automasystem.exceptions.ProdutoException;
+import br.com.systemautoma.automasystem.mother.EstoqueMother;
 import br.com.systemautoma.automasystem.mother.PagamentoMother;
+import br.com.systemautoma.automasystem.mother.ProdutoMother;
 import br.com.systemautoma.automasystem.mother.VendaItemMother;
+import br.com.systemautoma.automasystem.repository.ProdutoRepository;
+import br.com.systemautoma.automasystem.service.EstoqueService;
+import br.com.systemautoma.automasystem.service.ProdutoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
-@RunWith(SpringRunner.class)
+@AutoConfigureMockMvc
+//@RunWith(SpringRunner.class)
 @SpringBootTest
 public class VendaProcessamentoTest {
 
     private VendaItemBuilder builderItem;
-    private VendaProcessamento vendaProcessamento;
+   // private VendaProcessamento vendaProcessamento;
     private Venda venda;
+
+    @Autowired
+    ProdutoRepository produtoRepository;
+
+
+    @InjectMocks
+    private VendaProcessamento vendaProcessamento;
+
+    @Mock
+    private ProdutoService produtoService;
+
+    @Mock
+    private EstoqueService estoqueService;
 
     @BeforeEach
     public void setUp() {
+        produtoService = Mockito.mock(ProdutoService.class);
+        vendaProcessamento = new VendaProcessamento(produtoService, estoqueService);
+        MockitoAnnotations.initMocks(this);
+
         builderItem = new VendaItemBuilder();
-        vendaProcessamento = new VendaProcessamento();
         venda = vendaProcessamento.abreVenda();
         venda.setIdVenda(1L);
+        venda.setIdFilial(1L);
+
+
     }
 
     @Test
@@ -166,4 +200,124 @@ public class VendaProcessamentoTest {
     }
 
 
+    @Test
+    public void atualizaPrecoConformeTipoDeVendaVarejoTest() throws ProdutoException, BusinessVendaExpection {
+
+        VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(30)).eRetorna();
+        VendaItem item3 = builderItem.iniciaItemAlteravel().alteraStatusItemCacelado(false).eRetorna();
+        item2.setIdProduto(2L);
+        item2.setIdProduto(3L);
+
+        venda.setItens(Arrays.asList(item2,item3));
+
+        ProdutoDto produtoDto = Converter.INSTANCE.ProdutoToProdutoDto(ProdutoMother.getProduto());
+
+        Mockito.when(produtoService.buscarProdutoPorId(Mockito.anyLong())).thenReturn(produtoDto);
+
+        Venda vendaAtualizada = vendaProcessamento.atualizaPrecoConformeTipoDeVenda(this.venda);
+
+        assertEquals(venda.getItens().get(1).getValor(), vendaAtualizada.getItens().get(1).getValor());
+
+        vendaProcessamento.valorTotalVenda(venda);
+
+        assertEquals(new BigDecimal(400), venda.getValorTotal());
+    }
+
+    @Test
+    public void atualizaPrecoConformeTipoDeVendaAtacadoTest() throws ProdutoException, BusinessVendaExpection {
+
+        VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(30)).eRetorna();
+        VendaItem item3 = builderItem.iniciaItemAlteravel().alteraStatusItemCacelado(false).eRetorna();
+        item2.setIdProduto(2L);
+        item2.setIdProduto(3L);
+
+        venda.setItens(Arrays.asList(item2,item3));
+
+        ProdutoDto produtoDto = Converter.INSTANCE.ProdutoToProdutoDto(ProdutoMother.getProduto());
+
+        Mockito.when(produtoService.buscarProdutoPorId(Mockito.anyLong())).thenReturn(produtoDto);
+
+        venda.setTipoDePreco(TipoDePreco.ATACADO);
+
+        Venda vendaAtualizada = vendaProcessamento.atualizaPrecoConformeTipoDeVenda(this.venda);
+
+        assertEquals(venda.getItens().get(1).getValor(), vendaAtualizada.getItens().get(1).getValor());
+
+        vendaProcessamento.valorTotalVenda(venda);
+
+        assertEquals(new BigDecimal(200), venda.getValorTotal());
+    }
+
+    @Test
+    public void atualizaPrecoConformeTipoDeVendaParceladoTest() throws ProdutoException, BusinessVendaExpection {
+
+        VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(30)).eRetorna();
+        VendaItem item3 = builderItem.iniciaItemAlteravel().alteraStatusItemCacelado(false).eRetorna();
+        item2.setIdProduto(2L);
+        item2.setIdProduto(3L);
+
+        venda.setItens(Arrays.asList(item2,item3));
+
+        ProdutoDto produtoDto = Converter.INSTANCE.ProdutoToProdutoDto(ProdutoMother.getProduto());
+
+        Mockito.when(produtoService.buscarProdutoPorId(Mockito.anyLong())).thenReturn(produtoDto);
+
+        venda.setTipoDePreco(TipoDePreco.PARCELADO);
+
+        Venda vendaAtualizada = vendaProcessamento.atualizaPrecoConformeTipoDeVenda(this.venda);
+
+        assertEquals(venda.getItens().get(1).getValor(), vendaAtualizada.getItens().get(1).getValor());
+
+        vendaProcessamento.valorTotalVenda(venda);
+
+        assertEquals(new BigDecimal(700), venda.getValorTotal());
+    }
+
+    @Test
+    public void atualizaPrecoConformeTipoDeVendaPromocionalTest() throws ProdutoException, BusinessVendaExpection {
+
+        VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(30)).eRetorna();
+        VendaItem item3 = builderItem.iniciaItemAlteravel().alteraStatusItemCacelado(false).eRetorna();
+        item2.setIdProduto(2L);
+        item2.setIdProduto(3L);
+
+        venda.setItens(Arrays.asList(item2,item3));
+
+        ProdutoDto produtoDto = Converter.INSTANCE.ProdutoToProdutoDto(ProdutoMother.getProduto());
+
+        Mockito.when(produtoService.buscarProdutoPorId(Mockito.anyLong())).thenReturn(produtoDto);
+
+        venda.setTipoDePreco(TipoDePreco.PROMOCAO);
+
+        Venda vendaAtualizada = vendaProcessamento.atualizaPrecoConformeTipoDeVenda(this.venda);
+
+        assertEquals(venda.getItens().get(1).getValor(), vendaAtualizada.getItens().get(1).getValor());
+
+        vendaProcessamento.valorTotalVenda(venda);
+
+        assertEquals(new BigDecimal(100), venda.getValorTotal());
+    }
+
+    @Test
+    public void atualizaEstoqueAposPagamentoTest() throws BusinessVendaExpection {
+
+        VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(40))
+                .alteraIdDoEstoque(999L).eRetorna();
+        VendaItem item3 = builderItem.iniciaItemAlteravel().alteraStatusItemCacelado(false)
+                .alteraIdDoEstoque(999L).eRetorna();
+        venda.setItens(Arrays.asList(item2,item3));
+        vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.DINHEIRO);
+        vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.DINHEIRO);
+
+        ProdutoDto produtoDto = Converter.INSTANCE.ProdutoToProdutoDto(ProdutoMother.getProduto());
+        Mockito.when(produtoService.buscarProdutoPorId(Mockito.anyLong())).thenReturn(produtoDto);
+
+        Mockito.when(produtoService.buscarProdutoPorId(Mockito.anyLong())).thenReturn(produtoDto);
+
+        vendaProcessamento.atualizaEstoqueAposPagamento(venda);
+
+        assertEquals(1L, venda.getItens().get(0).getIdEStoque());
+        assertEquals(new BigDecimal(30), venda.getTroco());
+
+    }
 }

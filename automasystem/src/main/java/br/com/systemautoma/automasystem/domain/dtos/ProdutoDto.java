@@ -122,6 +122,7 @@ public class ProdutoDto {
 
     @Override
     public int hashCode() {
-        return Objects.hash(idProduto, nomeProduto, descricaoProduto, precos, estoques, ativo, codBarras, codPersonalizado, gradeDoProdutos, tipoDeProduto);
+        return Objects.hash(idProduto, nomeProduto, descricaoProduto, precos, estoques, ativo, codBarras,
+                codPersonalizado, gradeDoProdutos, tipoDeProduto);
     }
 }

@@ -1,5 +1,8 @@
 package br.com.systemautoma.automasystem.business.venda;
 
+import br.com.systemautoma.automasystem.business.PrecoDeVenda;
+import br.com.systemautoma.automasystem.domain.TipoDePreco;
+import br.com.systemautoma.automasystem.domain.dtos.ProdutoDto;
 import br.com.systemautoma.automasystem.domain.enumerador.StatusPagamento;
 import br.com.systemautoma.automasystem.domain.enumerador.TipoPagamento;
 import br.com.systemautoma.automasystem.entity.Cliente;
@@ -7,12 +10,30 @@ import br.com.systemautoma.automasystem.entity.Pagamento;
 import br.com.systemautoma.automasystem.entity.Venda;
 import br.com.systemautoma.automasystem.entity.VendaItem;
 import br.com.systemautoma.automasystem.exceptions.BusinessVendaExpection;
+import br.com.systemautoma.automasystem.exceptions.ProdutoException;
+import br.com.systemautoma.automasystem.service.EstoqueService;
+import br.com.systemautoma.automasystem.service.ProdutoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class VendaProcessamento {
+
+    @Autowired
+    ProdutoService produtoService;
+
+    @Autowired
+    EstoqueService estoqueService;
+
+    @Autowired
+    public VendaProcessamento(ProdutoService produtoService) { }
+
+    public VendaProcessamento(ProdutoService produtoService, EstoqueService estoqueService) { }
 
     public Venda abreVenda(){
 
@@ -20,10 +41,16 @@ public class VendaProcessamento {
         venda.setCliente(new Cliente());
         venda.getCliente().setNome("CONSUMIDOR");
         venda.getCliente().setIdCliente(1L);
+        venda.setTipoDePreco(TipoDePreco.VAREJO);
+        if(venda.getIdFilial() <= 0L ){
+            venda.setIdFilial(1l);
+        }
+
         return venda;
     }
 
     public void lancaItem(Venda venda, VendaItem item){
+        item.setIdEmpresa(venda.getIdFilial());
         venda.getItens().add(item);
     }
 
@@ -101,6 +128,111 @@ public class VendaProcessamento {
         }
     }
 
+    public Venda atualizaPrecoConformeTipoDeVenda (Venda venda) throws ProdutoException {
+
+        atualizaPrecosParaVendaVarejo(venda);
+
+        atualizaPrecosParaVendaAtacado(venda);
+
+        atualizaPrecosParaVendaParcelada(venda);
+
+        atualizaPrecosParaVendaPromocional(venda);
+
+
+        return venda;
+    }
+
+    private void atualizaPrecosParaVendaPromocional(Venda venda) {
+        if (venda.getTipoDePreco().equals(TipoDePreco.PROMOCAO)){
+            PrecoDeVenda precoDeVenda= new PrecoDeVendaPromocional();
+            venda.getItens().stream().forEach(vendaItem -> {
+                try {
+                    vendaItem.setValor(precoDeVenda
+                            .getPrecoDeVenda(this.buscaProdutoPorId(vendaItem) , venda.getIdFilial()));
+                } catch (ProdutoException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+    }
+
+    private void atualizaPrecosParaVendaParcelada(Venda venda) {
+        if (venda.getTipoDePreco().equals(TipoDePreco.PARCELADO)){
+            PrecoDeVenda precoDeVenda= new PrecoDeVendaParcelada();
+            venda.getItens().stream().forEach(vendaItem -> {
+                try {
+                    vendaItem.setValor(precoDeVenda
+                            .getPrecoDeVenda(this.buscaProdutoPorId(vendaItem) , venda.getIdFilial()));
+                } catch (ProdutoException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+    }
+
+    private void atualizaPrecosParaVendaAtacado(Venda venda) {
+        if (venda.getTipoDePreco().equals(TipoDePreco.ATACADO)){
+            PrecoDeVenda precoDeVenda= new PrecoDeVendaAtacado();
+            venda.getItens().stream().forEach(vendaItem -> {
+                try {
+                    vendaItem.setValor(precoDeVenda
+                            .getPrecoDeVenda(this.buscaProdutoPorId(vendaItem) , venda.getIdFilial()));
+                } catch (ProdutoException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+    }
+
+    private void atualizaPrecosParaVendaVarejo(Venda venda) {
+        if (venda.getTipoDePreco().equals(TipoDePreco.VAREJO)){
+            PrecoDeVenda precoDeVenda= new PrecoDeVendaVarejo();
+            venda.getItens().stream().forEach(vendaItem -> {
+                try {
+                    vendaItem.setValor(precoDeVenda
+                            .getPrecoDeVenda(this.buscaProdutoPorId(vendaItem) , venda.getIdFilial()));
+                } catch (ProdutoException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+    }
+
+    public ProdutoDto buscaProdutoPorId(VendaItem item) throws ProdutoException {
+        return produtoService.buscarProdutoPorId(item.getIdProduto());
+    }
+
+
+    public Venda atualizaEstoqueAposPagamento(Venda venda) {
+
+        if (venda.getStatusPagamento().equals(StatusPagamento.PAGO)){
+                venda.getItens().stream()
+                    .map( i -> {
+                        preencheIdDoEstoqueDoItem(i);
+                        return i; })
+                .forEach(this::baixaEstoqueDoItem);
+        }
+        return venda;
+    }
+
+    private void preencheIdDoEstoqueDoItem (VendaItem item) throws ProdutoException {
+
+        ProdutoDto produtoDto = this.buscaProdutoPorId(item);
+
+        Long id = produtoDto.getEstoques().stream().filter(p -> p.getIdFilial() == item.getIdEmpresa())
+                .map(p -> p.getIdEstoque())
+                .findFirst().orElseThrow(() -> new ProdutoException("Nao ha estoque cadastrado " +
+                        "para esse Produto nesta Filial"));
+
+        item.setIdEStoque(id);
+    }
+
+    private void baixaEstoqueDoItem (VendaItem item) throws ProdutoException {
+
+        estoqueService.baixaEstoqueAposVenda(item.getIdEStoque(), item.getQuantidadeVendida());
+
+    }
+
     private void cancelaTodosOsPagamentosDaVenda(Venda venda) {
         venda.getPagamentos().forEach( pagamento ->
                 pagamento.setStatusPagamento(StatusPagamento.CANCELADO));
@@ -145,5 +277,7 @@ public class VendaProcessamento {
         venda.setValorRestante(venda.getValorRestante().subtract(valor));
         return pagamento;
     }
+
+
 
 }
