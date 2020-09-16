@@ -7,6 +7,7 @@ import javax.persistence.Transient;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class Venda {
 
@@ -170,4 +171,32 @@ public class Venda {
     public StatusPagamento getStatusPagamento() { return statusPagamento; }
 
     public void setStatusPagamento(StatusPagamento statusPagamento) { this.statusPagamento = statusPagamento; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Venda venda = (Venda) o;
+        return idVenda == venda.idVenda &&
+                idFilial == venda.idFilial &&
+                Double.compare(venda.volume, volume) == 0 &&
+                vendaCancelada == venda.vendaCancelada &&
+                Objects.equals(itens, venda.itens) &&
+                Objects.equals(cliente, venda.cliente) &&
+                tipoDePreco == venda.tipoDePreco &&
+                Objects.equals(ValorRestante, venda.ValorRestante) &&
+                Objects.equals(valorItens, venda.valorItens) &&
+                Objects.equals(valorTotalDeDescontos, venda.valorTotalDeDescontos) &&
+                Objects.equals(valorTotalDeAcrescimos, venda.valorTotalDeAcrescimos) &&
+                Objects.equals(valorTotal, venda.valorTotal) &&
+                Objects.equals(pagamentos, venda.pagamentos) &&
+                Objects.equals(troco, venda.troco) &&
+                Objects.equals(statusVenda, venda.statusVenda) &&
+                statusPagamento == venda.statusPagamento;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idVenda, idFilial, itens, cliente, tipoDePreco, ValorRestante, volume, valorItens, valorTotalDeDescontos, valorTotalDeAcrescimos, valorTotal, pagamentos, troco, vendaCancelada, statusVenda, statusPagamento);
+    }
 }

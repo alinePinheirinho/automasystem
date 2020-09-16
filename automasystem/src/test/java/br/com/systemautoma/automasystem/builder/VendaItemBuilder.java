@@ -34,6 +34,11 @@ public class VendaItemBuilder {
         return this;
     }
 
+    public VendaItemBuilder alteraQauntidade(double quantidade){
+        itemAltevel.setQuantidadeVendida(quantidade);
+        return this;
+    }
+
     public VendaItem eRetorna(){
         return this.itemAltevel;
     }

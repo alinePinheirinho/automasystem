@@ -1,6 +1,8 @@
 package br.com.systemautoma.automasystem.domain.converter;
 
+import br.com.systemautoma.automasystem.domain.dtos.EstoqueDto;
 import br.com.systemautoma.automasystem.domain.dtos.ProdutoDto;
+import br.com.systemautoma.automasystem.entity.Estoque;
 import br.com.systemautoma.automasystem.entity.Produto;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -19,5 +21,10 @@ public interface Converter {
 
     @InheritInverseConfiguration
     ProdutoDto ProdutoToProdutoDto(Produto produto);
+
+    Estoque EstoqueDtoToEstoque(EstoqueDto estoqueDto);
+
+    @InheritInverseConfiguration
+    EstoqueDto EstoqueToEstoqueDto(Estoque estoque);
 
 }

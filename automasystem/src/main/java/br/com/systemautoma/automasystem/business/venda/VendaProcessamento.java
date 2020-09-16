@@ -2,6 +2,7 @@ package br.com.systemautoma.automasystem.business.venda;
 
 import br.com.systemautoma.automasystem.business.PrecoDeVenda;
 import br.com.systemautoma.automasystem.domain.TipoDePreco;
+import br.com.systemautoma.automasystem.domain.dtos.EstoqueDto;
 import br.com.systemautoma.automasystem.domain.dtos.ProdutoDto;
 import br.com.systemautoma.automasystem.domain.enumerador.StatusPagamento;
 import br.com.systemautoma.automasystem.domain.enumerador.TipoPagamento;
@@ -10,6 +11,7 @@ import br.com.systemautoma.automasystem.entity.Pagamento;
 import br.com.systemautoma.automasystem.entity.Venda;
 import br.com.systemautoma.automasystem.entity.VendaItem;
 import br.com.systemautoma.automasystem.exceptions.BusinessVendaExpection;
+import br.com.systemautoma.automasystem.exceptions.EstoqueException;
 import br.com.systemautoma.automasystem.exceptions.ProdutoException;
 import br.com.systemautoma.automasystem.service.EstoqueService;
 import br.com.systemautoma.automasystem.service.ProdutoService;
@@ -42,6 +44,7 @@ public class VendaProcessamento {
         venda.getCliente().setNome("CONSUMIDOR");
         venda.getCliente().setIdCliente(1L);
         venda.setTipoDePreco(TipoDePreco.VAREJO);
+        venda.setItens(new ArrayList<>());
         if(venda.getIdFilial() <= 0L ){
             venda.setIdFilial(1l);
         }
@@ -51,7 +54,36 @@ public class VendaProcessamento {
 
     public void lancaItem(Venda venda, VendaItem item){
         item.setIdEmpresa(venda.getIdFilial());
+
+        EstoqueDto estoqueDto = validaEstoqueDoProduto(item);
+        validaEstoqueItensVendaCorrente(venda, item, estoqueDto);
+
         venda.getItens().add(item);
+    }
+
+    private void validaEstoqueItensVendaCorrente(Venda venda, VendaItem item, EstoqueDto estoqueDto) {
+
+        Double somaDoEstoqueDoItemConciderandoLancamentosAtuais = venda.getItens().stream()
+                .filter(i -> !i.isCancelado() && i.getIdProduto() == item.getIdProduto()
+                && i.getIdEmpresa() == item.getIdEmpresa() && i.getIdVenda() == item.getIdVenda()).map((i -> i.getQuantidadeVendida()))
+                .reduce((ac, i) -> ac + i).orElse(0D);
+
+        if (somaDoEstoqueDoItemConciderandoLancamentosAtuais > estoqueDto.getQuantidade()) {
+            throw new EstoqueException("Os Lancamentos desse Item " + "nessa venda Ultrapassam " +
+                    "a Quantidade de" + " estoque existente. Estoque Existente = "+estoqueDto.getQuantidade() +
+                    " estoque somado para esse item = "+ somaDoEstoqueDoItemConciderandoLancamentosAtuais);
+        }
+    }
+
+    private EstoqueDto validaEstoqueDoProduto(VendaItem item) {
+        this.preencheIdDoEstoqueDoItem(item);
+        EstoqueDto estoqueDto = estoqueService.buscaEstoqueporId(item.getIdEStoque());
+
+        if (estoqueDto.getQuantidade() - item.getQuantidadeVendida() <0L){
+            throw new EstoqueException( "Saldo em estoque Insuficiente . Estoque Atual = "
+                    +estoqueDto.getQuantidade());
+        }
+        return estoqueDto;
     }
 
     public void removeItem(Venda venda, VendaItem item){

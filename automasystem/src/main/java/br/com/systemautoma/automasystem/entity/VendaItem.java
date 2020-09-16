@@ -3,6 +3,7 @@ package br.com.systemautoma.automasystem.entity;
 import br.com.systemautoma.automasystem.domain.TipoDePreco;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class VendaItem {
 
@@ -113,4 +114,27 @@ public class VendaItem {
     public long getIdEmpresa() {  return idEmpresa; }
 
     public void setIdEmpresa(long idEmpresa) { this.idEmpresa = idEmpresa; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VendaItem vendaItem = (VendaItem) o;
+        return idVendaItem == vendaItem.idVendaItem &&
+                idVenda == vendaItem.idVenda &&
+                idCliente == vendaItem.idCliente &&
+                idProduto == vendaItem.idProduto &&
+                idEStoque == vendaItem.idEStoque &&
+                idEmpresa == vendaItem.idEmpresa &&
+                Double.compare(vendaItem.quantidadeVendida, quantidadeVendida) == 0 &&
+                cancelado == vendaItem.cancelado &&
+                vendaCancelada == vendaItem.vendaCancelada &&
+                tipoDePreco == vendaItem.tipoDePreco &&
+                Objects.equals(valor, vendaItem.valor);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idVendaItem, idVenda, idCliente, idProduto, idEStoque, idEmpresa, tipoDePreco, valor, quantidadeVendida, cancelado, vendaCancelada);
+    }
 }

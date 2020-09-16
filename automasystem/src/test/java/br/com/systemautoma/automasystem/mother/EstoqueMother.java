@@ -8,7 +8,7 @@ public class EstoqueMother {
 
     public static Estoque getUmEstoqueParaOProduto(long idProduto){
         Estoque estoque = new Estoque(1L, 10L,
-                1L,100, 1L);
+                1L,100, idProduto);
 
         estoque.setIdEstoque(1L);
         return estoque;
