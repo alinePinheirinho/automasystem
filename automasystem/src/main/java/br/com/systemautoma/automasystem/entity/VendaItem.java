@@ -2,7 +2,9 @@ package br.com.systemautoma.automasystem.entity;
 
 import br.com.systemautoma.automasystem.domain.TipoDePreco;
 
+import javax.persistence.Transient;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 
 public class VendaItem {
@@ -18,6 +20,15 @@ public class VendaItem {
     private double quantidadeVendida;
     private boolean cancelado = false;
     private boolean vendaCancelada = false;
+    private BigDecimal valorUnitario;
+    @Transient
+    private Estoque estoque;
+    @Transient
+    private Preco preco;
+    @Transient
+    private List<Estoque> estoques;
+    @Transient
+    private List<Preco> precos;
 
     public VendaItem() { }
 
@@ -114,6 +125,30 @@ public class VendaItem {
     public long getIdEmpresa() {  return idEmpresa; }
 
     public void setIdEmpresa(long idEmpresa) { this.idEmpresa = idEmpresa; }
+
+    public Estoque getEstoque() { return estoque; }
+
+    public void setEstoque(Estoque estoque) { this.estoque = estoque; }
+
+    public Preco getPreco() { return preco; }
+
+    public void setPreco(Preco preco) { this.preco = preco; }
+
+    public BigDecimal getValorUnitario() { return valorUnitario;  }
+
+    public void setValorUnitario(BigDecimal valorUnitario) { this.valorUnitario = valorUnitario; }
+
+    public List<Estoque> getEstoques() { return estoques; }
+
+    public void setEstoques(List<Estoque> estoques) { this.estoques = estoques; }
+
+    public List<Preco> getPrecos() {
+        return precos;
+    }
+
+    public void setPrecos(List<Preco> precos) {
+        this.precos = precos;
+    }
 
     @Override
     public boolean equals(Object o) {

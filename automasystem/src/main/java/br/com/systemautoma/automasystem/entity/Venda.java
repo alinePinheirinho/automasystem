@@ -5,6 +5,7 @@ import br.com.systemautoma.automasystem.domain.enumerador.StatusPagamento;
 
 import javax.persistence.Transient;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +29,8 @@ public class Venda {
     private boolean vendaCancelada = false;
     private String statusVenda = "aberta";
     private StatusPagamento statusPagamento;
+    @Transient
+    private List<VendaParcelada> parcelas;
 
     public Venda() { }
 
@@ -171,6 +174,19 @@ public class Venda {
     public StatusPagamento getStatusPagamento() { return statusPagamento; }
 
     public void setStatusPagamento(StatusPagamento statusPagamento) { this.statusPagamento = statusPagamento; }
+
+    public String getStatusVenda() { return statusVenda; }
+
+    public void setStatusVenda(String statusVenda) { this.statusVenda = statusVenda; }
+
+    public List<VendaParcelada> getParcelas() {
+        if (parcelas == null){
+            parcelas = new ArrayList<>();
+        }
+        return parcelas;
+    }
+
+    public void setParcelas(List<VendaParcelada> parcelas) { this.parcelas = parcelas; }
 
     @Override
     public boolean equals(Object o) {

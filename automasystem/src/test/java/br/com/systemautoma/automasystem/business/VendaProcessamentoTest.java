@@ -9,6 +9,7 @@ import br.com.systemautoma.automasystem.domain.dtos.EstoqueDto;
 import br.com.systemautoma.automasystem.domain.dtos.ProdutoDto;
 import br.com.systemautoma.automasystem.domain.enumerador.StatusPagamento;
 import br.com.systemautoma.automasystem.domain.enumerador.TipoPagamento;
+import br.com.systemautoma.automasystem.entity.Cliente;
 import br.com.systemautoma.automasystem.entity.Produto;
 import br.com.systemautoma.automasystem.entity.Venda;
 import br.com.systemautoma.automasystem.entity.VendaItem;
@@ -278,6 +279,44 @@ public class VendaProcessamentoTest {
         vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.DINHEIRO);
         BigDecimal valorRestanteSegPagamento = vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.DINHEIRO);
         assertEquals(new BigDecimal(20), valorRestanteSegPagamento);
+    }
+
+    @Test
+    public void lancaPagamentoComPagamentoJaExistenteEParceladoTest() throws BusinessVendaExpection {
+        VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(90)).eRetorna();
+        VendaItem item3 = builderItem.iniciaItemAlteravel().alteraStatusItemCacelado(false).eRetorna();
+        Cliente cliente = new Cliente();
+        cliente.setIdCliente(2);
+        cliente.setNome("Aline A");
+        venda.setCliente(cliente);
+        venda.setItens(Arrays.asList(item2,item3));
+        vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.DINHEIRO);
+        BigDecimal valorRestanteSegPagamento = vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.PARCELADO_LOJA,2);
+        assertEquals(new BigDecimal(20), valorRestanteSegPagamento);
+        assertEquals(2, venda.getParcelas().size());
+        assertEquals(new BigDecimal(20), venda.getParcelas().get(0).getValorParcela());
+        assertEquals(new BigDecimal(40), venda.getParcelas().get(0).getValorParcelado());
+        assertEquals(new BigDecimal(100), venda.getParcelas().get(0).getValorVenda());
+    }
+
+    @Test
+    public void lancaPagamentoComPagamentoJaExistenteParceladoTest() throws BusinessVendaExpection {
+        VendaItem item2 = builderItem.iniciaItemAlteravel().alteraValor(new BigDecimal(90)).eRetorna();
+        VendaItem item3 = builderItem.iniciaItemAlteravel().alteraStatusItemCacelado(false).eRetorna();
+        Cliente cliente = new Cliente();
+        cliente.setIdCliente(2);
+        cliente.setNome("Aline A");
+        venda.setCliente(cliente);
+        venda.setItens(Arrays.asList(item2,item3));
+        vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.DINHEIRO);
+        vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.PARCELADO_LOJA,2);
+        BigDecimal valorRestanteSegPagamento = vendaProcessamento.lancaPagamento(venda, new BigDecimal(40), TipoPagamento.DINHEIRO);
+        assertEquals(BigDecimal.ZERO, valorRestanteSegPagamento);
+        assertEquals(new BigDecimal(20), venda.getTroco());
+        assertEquals(2, venda.getParcelas().size());
+        assertEquals(new BigDecimal(20), venda.getParcelas().get(0).getValorParcela());
+        assertEquals(new BigDecimal(40), venda.getParcelas().get(0).getValorParcelado());
+        assertEquals(new BigDecimal(100), venda.getParcelas().get(0).getValorVenda());
     }
 
     @Test
