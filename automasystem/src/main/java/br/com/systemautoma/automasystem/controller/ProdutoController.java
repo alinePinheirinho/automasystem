@@ -3,6 +3,8 @@ package br.com.systemautoma.automasystem.controller;
 import br.com.systemautoma.automasystem.domain.dtos.ProdutoDto;
 import br.com.systemautoma.automasystem.exceptions.ProdutoException;
 import br.com.systemautoma.automasystem.service.ProdutoService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,11 +15,13 @@ import javax.validation.Valid;
 @Validated
 @RequestMapping("/produtos")
 @RestController
+@Api(value = "Controller de Produtos")
 public class ProdutoController {
 
     @Autowired
     ProdutoService produtoService;
 
+    @ApiOperation(value = "Endpoint que cadastra novos produtos no sistema")
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "produto", method = RequestMethod.POST)
     public void cadastrarProduto(@Valid ProdutoDto produtoDto){
